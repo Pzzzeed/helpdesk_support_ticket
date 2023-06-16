@@ -2,18 +2,19 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
+import ticketsRouter from "./routers/tickets.router.js";
 
 async function init() {
   dotenv.config();
 
-  //   mongoose.set("strictQuery", true);
+  mongoose.set("strictQuery", true);
 
-  //   try {
-  //     await mongoose.connect(process.env.DATABASE_URL);
-  //     console.log("Connected to MongoDB!");
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
+  try {
+    await mongoose.connect(process.env.DATABASE_URL);
+    console.log("Connected to MongoDB!");
+  } catch (error) {
+    console.log(error);
+  }
 
   const app = express();
   const port = 4000;
@@ -22,6 +23,7 @@ async function init() {
 
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
+  app.use("/tickets", ticketsRouter);
 
   app.get("/", (req, res) => {
     res.send("Hello World!");
