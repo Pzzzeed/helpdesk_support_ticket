@@ -3,6 +3,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
 import ticketsRouter from "./routers/tickets.router.js";
+import kanbanRouter from "./routers/kanban.router.js";
 
 async function init() {
   dotenv.config();
@@ -24,6 +25,7 @@ async function init() {
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
   app.use("/tickets", ticketsRouter);
+  app.use("/kanban", kanbanRouter);
 
   app.get("/", (req, res) => {
     res.send("Hello World!");

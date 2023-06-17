@@ -18,6 +18,8 @@ const CreateTicketForm = forwardRef((props, ref) => {
     });
   };
 
+  // function to use ref that send from parent component to trigger handlesubmit
+
   useImperativeHandle(ref, () => ({
     submit: () => {
       handleSubmit(new Event("submit", { cancelable: true }));
@@ -25,6 +27,7 @@ const CreateTicketForm = forwardRef((props, ref) => {
   }));
 
   return (
+    // form for create ticket component
     <form onSubmit={handleSubmit}>
       <Box>
         <label>

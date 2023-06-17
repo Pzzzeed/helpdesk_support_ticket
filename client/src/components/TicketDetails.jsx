@@ -12,6 +12,8 @@ const TicketDetails = (props) => {
     getTicketById(props.userId);
   }, []);
 
+  //function for change format date
+
   const dateCreateStr = ticket?.createdAt;
   const dateCreated = new Date(dateCreateStr);
   const formattedCreatedDate = dateCreated.toLocaleString("en-US", {
@@ -21,7 +23,7 @@ const TicketDetails = (props) => {
     hour: "2-digit",
     minute: "2-digit",
   });
-
+  //function for change format date
   const dateUpdateStr = ticket?.updatedAt;
   const dateUpdated = new Date(dateUpdateStr);
   const formattedUpdatedDate = dateUpdated.toLocaleString("en-US", {

@@ -1,14 +1,15 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
 
+// custom context and react hook
 const useTickets = () => {
-  const navigate = useNavigate();
   const [tickets, setTickets] = useState([]);
   const [ticket, setTicket] = useState(null);
+  const [ticketBoard, setTicketBoard] = useState([]);
   const [totalPages, setTotalPages] = useState(0);
   const [isError, setIsError] = useState(null);
   const [isLoading, setIsLoading] = useState(null);
+  const [isUpdated, setIsUpdated] = useState(null);
 
   const getTickets = async (input) => {
     const { status, keywords, page, sortBy } = input;
@@ -61,13 +62,29 @@ const useTickets = () => {
   };
 
   const updateTicketById = async (postId, data) => {
+    setIsUpdated(true);
     try {
       setIsError(false);
       setIsLoading(true);
       const backend = import.meta.env.VITE_BACKEND_URL;
       await axios.put(`${backend}/tickets/${postId}`, data);
       setIsLoading(false);
-      navigate("/");
+    } catch (error) {
+      setIsError(true);
+      setIsLoading(false);
+    } finally {
+      setIsUpdated(false);
+    }
+  };
+
+  const getTicketBoard = async () => {
+    try {
+      setIsError(false);
+      setIsLoading(true);
+      const backend = import.meta.env.VITE_BACKEND_URL;
+      const result = await axios.get(`${backend}/kanban`);
+      setTicketBoard(result.data.data);
+      setIsLoading(false);
     } catch (error) {
       setIsError(true);
       setIsLoading(false);
@@ -84,6 +101,12 @@ const useTickets = () => {
     updateTicketById,
     isError,
     isLoading,
+    setIsLoading,
+    getTicketBoard,
+    ticketBoard,
+    setTicketBoard,
+    isUpdated,
+    setIsUpdated, // Include setIsUpdated in the returned object
   };
 };
 

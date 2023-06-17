@@ -1,20 +1,27 @@
 import {
-  Button,
   Flex,
   Text,
-  Image,
   Box,
-  Input,
   Tabs,
   TabList,
   TabPanels,
   Tab,
   TabPanel,
+  Image,
 } from "@chakra-ui/react";
 import TicketManagement from "../components/TicketManagement";
-import Dashboard from "./Dashboard";
+import KanbanBoard from "../components/KanbanBoard";
+import { EditIcon, ChevronRightIcon } from "@chakra-ui/icons";
+
+import { useState } from "react";
 
 const HomePage = () => {
+  const [refresh, setRefresh] = useState(null);
+
+  //function for refresh each tab
+  const handleButtonClick = () => {
+    setRefresh(true);
+  };
   return (
     <Flex w="100vw" m="auto">
       <Tabs variant="unstyled">
@@ -28,14 +35,20 @@ const HomePage = () => {
               justifyContent="center"
               alignItems="center"
             >
-              {/* <Image src="" mb={4}/> */}
+              <Box w="50px" h="23px" bg="white" borderRadius={5} mb="5px">
+                <Image src="/logo-no-background.svg" />
+              </Box>
+
               <Text textStyle="b1" color="green.400">
                 Helpdesk Support System
               </Text>
             </Box>
             <TabList>
               <Box w="240px" h="540px" display="flex" flexDirection="column">
-                <Tab _selected={{ color: "white", bg: "green.400" }}>
+                <Tab
+                  _selected={{ color: "white", bg: "green.400" }}
+                  onClick={handleButtonClick}
+                >
                   <Box
                     h="72px"
                     display="flex"
@@ -46,16 +59,21 @@ const HomePage = () => {
                       {/* <Image src=""/> */}
                       <Text textStyle="b1" color="white" ml={5}>
                         Ticket Management
+                        <ChevronRightIcon />
                       </Text>
                     </Box>
                   </Box>
                 </Tab>
-                <Tab _selected={{ color: "white", bg: "green.400" }}>
+                <Tab
+                  _selected={{ color: "white", bg: "green.400" }}
+                  onClick={handleButtonClick}
+                >
                   <Box h="72px" display="flex" alignItems="center">
                     <Box display="flex" w="190px">
                       {/* <Image src=""/> */}
                       <Text textStyle="b1" color="white" ml={5}>
-                        Dashboard
+                        Kanban board
+                        <ChevronRightIcon />
                       </Text>
                     </Box>
                   </Box>
@@ -66,10 +84,10 @@ const HomePage = () => {
           <Flex>
             <TabPanels>
               <TabPanel p={0}>
-                <TicketManagement />
+                <TicketManagement refresh={refresh} setRefresh={setRefresh} />
               </TabPanel>
               <TabPanel p={0}>
-                <Dashboard />
+                <KanbanBoard refresh={refresh} setRefresh={setRefresh} />
               </TabPanel>
             </TabPanels>
           </Flex>

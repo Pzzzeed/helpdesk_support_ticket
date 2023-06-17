@@ -1,0 +1,5 @@
+// on clound database 
+DATABASE_URL = <your connection string>&dbname=<your database name>
+
+// on compass
+DATABASE_URL = <your connection string>

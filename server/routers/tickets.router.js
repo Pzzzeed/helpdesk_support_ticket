@@ -4,6 +4,7 @@ import {
   createTicket,
   updateTicket,
   getTicketById,
+  getTicketsBoard,
 } from "../controllers/tickets.controller.js";
 
 const ticketsRouter = Router();

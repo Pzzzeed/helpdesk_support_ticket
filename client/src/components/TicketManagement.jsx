@@ -3,23 +3,18 @@ import {
   Button,
   Flex,
   Text,
-  Image,
   Box,
   Input,
   Select,
   Table,
   Thead,
   Tbody,
-  Tfoot,
   Tr,
   Th,
   Td,
-  TableCaption,
   TableContainer,
-  Textarea,
 } from "@chakra-ui/react";
 import TicketDetails from "./TicketDetails";
-import axios from "axios";
 import {
   Search2Icon,
   AddIcon,
@@ -42,13 +37,15 @@ import {
 import CreateTicketForm from "./CreateTicketForm";
 import EditTicket from "./EditTicket";
 
-const TicketManagement = () => {
+const TicketManagement = (props) => {
   const [showDetail, setShowDetail] = useState(false);
   const [page, setPage] = useState(1);
   const [keywords, setKeywords] = useState("");
   const [status, setStatus] = useState("");
   const [sortBy, setSortBy] = useState("");
-  const { tickets, totalPages, getTickets, isError, isLoading } = useTickets();
+  const [newTicket, setNewTicket] = useState(false);
+  const { tickets, totalPages, getTickets, isError, isLoading, setIsLoading } =
+    useTickets();
   const [user, setUser] = useState(null);
 
   //state for create modal
@@ -67,36 +64,39 @@ const TicketManagement = () => {
     getTickets({ status, keywords, page, sortBy });
   }, [status, keywords, page, sortBy, isOpen, showUpdateModal]);
 
-  // ฟังก์ชั่นเมื่อกดปุ่มดูรายละเอียดบนแต่ละการจอง
+  // get update data when click on sidebar
+  if (props.refresh) {
+    getTickets({ status, keywords, page, sortBy });
+    props.setRefresh(false);
+  }
+
+  // ฟังก์ชั่นเมื่อกดปุ่มดูรายละเอียด Ticket
   const handleViewDetail = (user) => {
     setUser(user);
     setShowDetail(true);
   };
 
-  // ส่ง trigger create event ไปที่ component create form
+  // ส่ง ref และ trigger เพื่อ ไปอ้างอิิง modal create ticket
 
   const handleCreateClick = () => {
     if (formRef.current) {
       formRef.current.submit();
+      setIsLoading(true);
       setTimeout(() => {
         onClose();
       }, 1500);
     }
   };
-
+  // ส่ง ref และ trigger เพื่อ ไปอ้างอิิง modal update ticket
   const handleUpdateClick = () => {
     if (formRef.current) {
       formRef.current.submit();
+      setIsLoading(true);
       setTimeout(() => {
         setShowUpdateModal(false);
       }, 1500);
     }
   };
-
-  // แสดง Component `CustomerBookingDetail` หากกดดูรายละเอียดการจอง
-  if (showDetail) {
-    return <TicketDetails setShowDetail={setShowDetail} userId={user} />;
-  }
 
   // update click handle
   const handleOpenModal = (ticket) => {
@@ -104,12 +104,18 @@ const TicketManagement = () => {
     setShowUpdateModal(true);
   };
 
+  // แสดง Component `TicketDetails` หากกดดูรายละเอียด ticket
+  if (showDetail) {
+    return <TicketDetails setShowDetail={setShowDetail} userId={user} />;
+  }
+
   return (
     <Flex w="83vw" h="100vh" flexDirection="column">
       <Flex w="100%" h="10%" alignItems="center" justifyContent="space-between">
         <Text ml={20} textStyle="h5" color="black">
-          Ticket Management
+          Ticket Support Management
         </Text>
+        {/* search box */}
         <Box
           display="flex"
           w="320px"
@@ -132,7 +138,7 @@ const TicketManagement = () => {
           ></Input>
         </Box>
       </Flex>
-
+      {/* sort and filter box */}
       <Flex
         w="100%"
         h="10%"
@@ -150,7 +156,6 @@ const TicketManagement = () => {
           borderRadius={5}
           alignItems="center"
         >
-          {/* <Search2Icon boxSize={5} ml={3} color="#646D89" /> */}
           <Select
             placeholder="Sort by"
             id="sortby"
@@ -172,7 +177,6 @@ const TicketManagement = () => {
           borderRadius={5}
           alignItems="center"
         >
-          {/* <Search2Icon boxSize={5} ml={3} color="#646D89" /> */}
           <Select
             placeholder="View by status"
             id="status"
@@ -215,13 +219,20 @@ const TicketManagement = () => {
                 <Button colorScheme="blue" mr={3} onClick={onClose}>
                   Close
                 </Button>
-                <Button variant="secondary" onClick={handleCreateClick}>
-                  Create
-                </Button>
+                {isLoading ? (
+                  <Button variant="secondary" isLoading>
+                    Create
+                  </Button>
+                ) : (
+                  <Button variant="secondary" onClick={handleCreateClick}>
+                    Create
+                  </Button>
+                )}
               </ModalFooter>
             </ModalContent>
           </Modal>
         </>
+        {/* table for render ticket */}
         <Box w="100%" display="flex" flexDirection="column" mt={55}>
           <TableContainer>
             <Table
@@ -257,58 +268,57 @@ const TicketManagement = () => {
                   </Th>
                 </Tr>
               </Thead>
-              {tickets.map((ticket, index) => {
-                let rowBG;
-                if (ticket.status === "test") {
-                  rowBG = "white";
-                } else {
-                  rowBG = "white";
-                }
-                let textColor;
-                let bgColor;
-                if (ticket.status === "accepted") {
-                  textColor = "#084BAF";
-                  bgColor = "#E4ECFF";
-                } else if (ticket.status === "rejected") {
-                  textColor = "#FFE5E5";
-                  bgColor = "#A50606";
-                } else if (ticket.status === "pending") {
-                  textColor = "#F0F1F8";
-                  bgColor = "#6E7288";
-                } else if (ticket.status === "resolved") {
-                  textColor = "#E5FFFA";
-                  bgColor = "#006753";
-                }
-
-                const dateCreateStr = ticket.createdAt;
-                const dateCreated = new Date(dateCreateStr);
-                const formattedCreatedDate = dateCreated.toLocaleString(
-                  "en-US",
-                  {
-                    year: "numeric",
-                    month: "2-digit",
-                    day: "2-digit",
-                    hour: "2-digit",
-                    minute: "2-digit",
+              <Tbody>
+                {tickets.map((ticket, index) => {
+                  let textColor;
+                  let bgColor;
+                  // logic for change color bg and text
+                  if (ticket.status === "accepted") {
+                    textColor = "#084BAF";
+                    bgColor = "#E4ECFF";
+                  } else if (ticket.status === "rejected") {
+                    textColor = "#FFE5E5";
+                    bgColor = "#A50606";
+                  } else if (ticket.status === "pending") {
+                    textColor = "#F0F1F8";
+                    bgColor = "#6E7288";
+                  } else if (ticket.status === "resolved") {
+                    textColor = "#E5FFFA";
+                    bgColor = "#006753";
                   }
-                );
 
-                const dateUpdateStr = ticket.updatedAt;
-                const dateUpdated = new Date(dateUpdateStr);
-                const formattedUpdatedDate = dateUpdated.toLocaleString(
-                  "en-US",
-                  {
-                    year: "numeric",
-                    month: "2-digit",
-                    day: "2-digit",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  }
-                );
+                  //function for change format date
 
-                return (
-                  <Tbody key={index}>
-                    <Tr>
+                  const dateCreateStr = ticket.createdAt;
+                  const dateCreated = new Date(dateCreateStr);
+                  const formattedCreatedDate = dateCreated.toLocaleString(
+                    "en-US",
+                    {
+                      year: "numeric",
+                      month: "2-digit",
+                      day: "2-digit",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    }
+                  );
+
+                  //function for change format date
+
+                  const dateUpdateStr = ticket.updatedAt;
+                  const dateUpdated = new Date(dateUpdateStr);
+                  const formattedUpdatedDate = dateUpdated.toLocaleString(
+                    "en-US",
+                    {
+                      year: "numeric",
+                      month: "2-digit",
+                      day: "2-digit",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    }
+                  );
+
+                  return (
+                    <Tr key={index}>
                       <Td>
                         <Box>
                           <Text textStyle="b1" color="black" textAlign="center">
@@ -371,6 +381,7 @@ const TicketManagement = () => {
                           </Text>
                         </Box>
                       </Td>
+                      {/* button for update ticket and view ticket details */}
                       <Box
                         textAlign="center"
                         display="flex"
@@ -390,9 +401,9 @@ const TicketManagement = () => {
                         </Button>
                       </Box>
                     </Tr>
-                  </Tbody>
-                );
-              })}
+                  );
+                })}
+              </Tbody>
             </Table>
           </TableContainer>
 
@@ -424,9 +435,19 @@ const TicketManagement = () => {
                 >
                   Cancel
                 </Button>
-                <Button variant="secondary" onClick={handleUpdateClick}>
-                  Update
-                </Button>
+                {isLoading ? (
+                  <Button variant="secondary" isLoading>
+                    Update
+                  </Button>
+                ) : (
+                  <Button
+                    variant="secondary"
+                    onClick={handleUpdateClick}
+                    type="submit"
+                  >
+                    Update
+                  </Button>
+                )}
               </ModalFooter>
             </ModalContent>
           </Modal>
@@ -440,7 +461,7 @@ const TicketManagement = () => {
               <ArrowBackIcon />
             </Button>
           ) : (
-            <Button disabled={page > 1 && tickets.length}>
+            <Button isDisabled>
               <ArrowBackIcon />
             </Button>
           )}
@@ -450,7 +471,7 @@ const TicketManagement = () => {
               <ArrowForwardIcon />
             </Button>
           ) : (
-            <Button disabled={page !== totalPages && tickets.length}>
+            <Button isDisabled>
               <ArrowForwardIcon />
             </Button>
           )}

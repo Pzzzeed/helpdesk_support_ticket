@@ -16,6 +16,8 @@ const EditTicket = forwardRef((props, ref) => {
   const [status, setStatus] = useState("");
   const formRef = useRef(null);
 
+  // function to use ref that send from parent component to trigger handlesubmit
+
   useImperativeHandle(ref, () => ({
     submit: () => {
       handleSubmit(new Event("submit", { cancelable: true }));
@@ -42,6 +44,7 @@ const EditTicket = forwardRef((props, ref) => {
   };
 
   return (
+    // form for edit ticket component
     <form onSubmit={handleSubmit}>
       <Box>
         <label>
