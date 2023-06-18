@@ -35,7 +35,7 @@ const TicketDetails = (props) => {
   });
 
   return (
-    <Flex h="100vh" flexDirection="column">
+    <Flex h="100vh" w="100%" flexDirection="column">
       <Flex w="1200px" h="10%" alignItems="center">
         <CloseIcon
           ml={20}
@@ -57,7 +57,6 @@ const TicketDetails = (props) => {
         justifyContent="flex-start"
         alignItems="center"
         pb={20}
-        overflow="scroll"
         overflowX="hidden"
       >
         <Box

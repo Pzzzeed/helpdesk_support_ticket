@@ -10,8 +10,8 @@ import {
 const ticketsRouter = Router();
 
 ticketsRouter.get("/", getTickets);
-ticketsRouter.post("/", createTicket);
-ticketsRouter.put("/:id", updateTicket);
+ticketsRouter.post("/create", createTicket);
+ticketsRouter.put("/update/:id", updateTicket);
 ticketsRouter.get("/:id", getTicketById);
 
 export default ticketsRouter;

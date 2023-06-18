@@ -53,7 +53,7 @@ const useTickets = () => {
       setIsError(false);
       setIsLoading(true);
       const backend = import.meta.env.VITE_BACKEND_URL;
-      await axios.post(`${backend}/tickets`, data);
+      await axios.post(`${backend}/tickets/create`, data);
       setIsLoading(false);
     } catch (error) {
       setIsError(true);
@@ -67,7 +67,7 @@ const useTickets = () => {
       setIsError(false);
       setIsLoading(true);
       const backend = import.meta.env.VITE_BACKEND_URL;
-      await axios.put(`${backend}/tickets/${postId}`, data);
+      await axios.put(`${backend}/tickets/update/${postId}`, data);
       setIsLoading(false);
     } catch (error) {
       setIsError(true);

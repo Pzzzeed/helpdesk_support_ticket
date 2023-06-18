@@ -28,7 +28,6 @@ function Column({ column, handleViewDetail, ticketBoard, index }) {
         {(provided) => {
           return (
             <Stack
-              // ref={dropRef}
               direction={{ base: "row", md: "column" }}
               h={{ base: "80%", md: "80%" }}
               p={4}
@@ -40,7 +39,6 @@ function Column({ column, handleViewDetail, ticketBoard, index }) {
               overflow="auto"
               {...provided.droppableProps}
               ref={provided.innerRef}
-              // opacity={isOver ? 0.85 : 1}
             >
               {getColumnTasks(column).map((task) => {
                 let textColor;
@@ -65,7 +63,7 @@ function Column({ column, handleViewDetail, ticketBoard, index }) {
                     draggableId={task._id}
                     index={index}
                   >
-                    {(provided) => (
+                    {(provided, snapshot) => (
                       <Box
                         bg={bgColor}
                         key={task._id}
@@ -77,6 +75,7 @@ function Column({ column, handleViewDetail, ticketBoard, index }) {
                         {...provided.draggableProps}
                         {...provided.dragHandleProps}
                         ref={provided.innerRef}
+                        snapshot={snapshot}
                       >
                         <Text
                           textStyle="b1"

@@ -71,17 +71,21 @@ const KanbanBoard = (props) => {
         status: destinationColumn.status,
       };
 
-      // Update ticket status in backend
-      await updateTicketById(updatedTicket._id, updatedTicket);
-
       // Update ticket status in frontend
       const updatedTicketBoard = ticketBoard.map((ticket) =>
-        ticket._id === draggableId
-          ? { ...ticket, status: destinationColumn.status }
-          : ticket
+        ticket._id === draggableId ? updatedTicket : ticket
       );
 
       setTicketBoard(updatedTicketBoard);
+
+      try {
+        // Update ticket status in backend
+        await updateTicketById(updatedTicket._id, updatedTicket);
+      } catch (error) {
+        // Revert the ticket status in case of an error
+        setTicketBoard(ticketBoard);
+        console.error("Error updating ticket status:", error);
+      }
     }
   };
 
