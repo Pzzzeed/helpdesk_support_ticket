@@ -11,17 +11,11 @@ import {
 } from "@chakra-ui/react";
 import TicketManagement from "../components/TicketManagement";
 import KanbanBoard from "../components/KanbanBoard";
-import { EditIcon, ChevronRightIcon } from "@chakra-ui/icons";
-
-import { useState } from "react";
+import { ChevronRightIcon } from "@chakra-ui/icons";
+import { useTickets } from "../contexts/useTicket";
 
 const HomePage = () => {
-  const [refresh, setRefresh] = useState(null);
-
-  //function for refresh each tab
-  const handleButtonClick = () => {
-    setRefresh(true);
-  };
+  const { ticketBoard } = useTickets();
   return (
     <Flex w="100vw" m="auto">
       <Tabs variant="unstyled">
@@ -45,10 +39,7 @@ const HomePage = () => {
             </Box>
             <TabList>
               <Box w="240px" h="540px" display="flex" flexDirection="column">
-                <Tab
-                  _selected={{ color: "white", bg: "green.400" }}
-                  onClick={handleButtonClick}
-                >
+                <Tab _selected={{ color: "white", bg: "green.400" }}>
                   <Box
                     h="72px"
                     display="flex"
@@ -64,10 +55,7 @@ const HomePage = () => {
                     </Box>
                   </Box>
                 </Tab>
-                <Tab
-                  _selected={{ color: "white", bg: "green.400" }}
-                  onClick={handleButtonClick}
-                >
+                <Tab _selected={{ color: "white", bg: "green.400" }}>
                   <Box h="72px" display="flex" alignItems="center">
                     <Box display="flex" w="190px">
                       {/* <Image src=""/> */}
@@ -84,10 +72,10 @@ const HomePage = () => {
           <Flex>
             <TabPanels>
               <TabPanel p={0}>
-                <TicketManagement refresh={refresh} setRefresh={setRefresh} />
+                <TicketManagement />
               </TabPanel>
               <TabPanel p={0}>
-                <KanbanBoard refresh={refresh} setRefresh={setRefresh} />
+                <KanbanBoard />
               </TabPanel>
             </TabPanels>
           </Flex>

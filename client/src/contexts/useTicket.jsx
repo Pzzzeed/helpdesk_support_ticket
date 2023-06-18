@@ -1,15 +1,17 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 
+const TicketsContext = React.createContext();
+
 // custom context and react hook
-const useTickets = () => {
+const TicketsProvider = (props) => {
   const [tickets, setTickets] = useState([]);
   const [ticket, setTicket] = useState(null);
   const [ticketBoard, setTicketBoard] = useState([]);
   const [totalPages, setTotalPages] = useState(0);
   const [isError, setIsError] = useState(null);
   const [isLoading, setIsLoading] = useState(null);
-  const [isUpdated, setIsUpdated] = useState(null);
+  const [isUpdated, setIsUpdated] = useState(false);
 
   const getTickets = async (input) => {
     const { status, keywords, page, sortBy } = input;
@@ -27,9 +29,10 @@ const useTickets = () => {
       );
       setTickets(results.data.data);
       setTotalPages(results.data.total_pages);
-      setIsLoading(false);
     } catch (error) {
       setIsError(true);
+      setIsLoading(false);
+    } finally {
       setIsLoading(false);
     }
   };
@@ -41,39 +44,43 @@ const useTickets = () => {
       const backend = import.meta.env.VITE_BACKEND_URL;
       const result = await axios.get(`${backend}/tickets/${ticketId}`);
       setTicket(result.data.data);
-      setIsLoading(false);
     } catch (error) {
       setIsError(true);
+      setIsLoading(false);
+    } finally {
       setIsLoading(false);
     }
   };
 
   const createTicket = async (data) => {
+    // setIsUpdated(false);
     try {
       setIsError(false);
       setIsLoading(true);
       const backend = import.meta.env.VITE_BACKEND_URL;
       await axios.post(`${backend}/tickets/create`, data);
-      setIsLoading(false);
     } catch (error) {
       setIsError(true);
+      setIsLoading(false);
+    } finally {
+      setIsUpdated(!isUpdated);
       setIsLoading(false);
     }
   };
 
   const updateTicketById = async (postId, data) => {
-    setIsUpdated(true);
+    // setIsUpdated(false);
     try {
       setIsError(false);
       setIsLoading(true);
       const backend = import.meta.env.VITE_BACKEND_URL;
       await axios.put(`${backend}/tickets/update/${postId}`, data);
-      setIsLoading(false);
     } catch (error) {
       setIsError(true);
       setIsLoading(false);
     } finally {
-      setIsUpdated(false);
+      setIsUpdated(!isUpdated);
+      setIsLoading(false);
     }
   };
 
@@ -84,30 +91,38 @@ const useTickets = () => {
       const backend = import.meta.env.VITE_BACKEND_URL;
       const result = await axios.get(`${backend}/kanban`);
       setTicketBoard(result.data.data);
-      setIsLoading(false);
     } catch (error) {
       setIsError(true);
+      setIsLoading(false);
+    } finally {
       setIsLoading(false);
     }
   };
 
-  return {
-    tickets,
-    totalPages,
-    ticket,
-    getTickets,
-    getTicketById,
-    createTicket,
-    updateTicketById,
-    isError,
-    isLoading,
-    setIsLoading,
-    getTicketBoard,
-    ticketBoard,
-    setTicketBoard,
-    isUpdated,
-    setIsUpdated, // Include setIsUpdated in the returned object
-  };
+  return (
+    <TicketsContext.Provider
+      value={{
+        tickets,
+        totalPages,
+        ticket,
+        getTickets,
+        getTicketById,
+        createTicket,
+        updateTicketById,
+        isError,
+        isLoading,
+        setIsLoading,
+        getTicketBoard,
+        ticketBoard,
+        setTicketBoard,
+        isUpdated,
+      }}
+    >
+      {props.children}
+    </TicketsContext.Provider>
+  );
 };
 
-export default useTickets;
+const useTickets = () => React.useContext(TicketsContext);
+
+export { TicketsProvider, useTickets };

@@ -3,7 +3,7 @@ import { Flex, Text, Image, Box } from "@chakra-ui/react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { CloseIcon } from "@chakra-ui/icons";
-import useTickets from "../hooks/useTicket";
+import { useTickets } from "../contexts/useTicket";
 
 const TicketDetails = (props) => {
   const { getTicketById, ticket } = useTickets();
@@ -57,6 +57,7 @@ const TicketDetails = (props) => {
         justifyContent="flex-start"
         alignItems="center"
         pb={20}
+        overflow="auto"
         overflowX="hidden"
       >
         <Box

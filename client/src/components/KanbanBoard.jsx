@@ -3,7 +3,7 @@ import { Box, Container, Heading, SimpleGrid } from "@chakra-ui/react";
 import Column from "./Column";
 import TicketDetails from "./TicketDetails";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
-import useTickets from "../hooks/useTicket";
+import { useTickets } from "../contexts/useTicket";
 
 const KanbanBoard = (props) => {
   const [showDetail, setShowDetail] = useState(false);
@@ -12,21 +12,14 @@ const KanbanBoard = (props) => {
   const {
     ticketBoard,
     getTicketBoard,
-    isError,
-    isLoading,
     updateTicketById,
     setTicketBoard,
+    isUpdated,
   } = useTickets();
 
   useEffect(() => {
     getTicketBoard();
-  }, []);
-
-  // get update data when click on sidebar
-  if (props.refresh) {
-    getTicketBoard();
-    props.setRefresh(false);
-  }
+  }, [isUpdated]);
 
   // define column type to use with column
   const ColumnType = [

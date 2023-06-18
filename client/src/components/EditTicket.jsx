@@ -5,7 +5,7 @@ import {
   useImperativeHandle,
   useEffect,
 } from "react";
-import useTickets from "../hooks/useTicket";
+import { useTickets } from "../contexts/useTicket";
 import { Input, Textarea, Box, Select } from "@chakra-ui/react";
 
 const EditTicket = forwardRef((props, ref) => {

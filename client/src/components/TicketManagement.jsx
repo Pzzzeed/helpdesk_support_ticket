@@ -23,7 +23,7 @@ import {
   EditIcon,
   ViewIcon,
 } from "@chakra-ui/icons";
-import useTickets from "../hooks/useTicket";
+import { useTickets } from "../contexts/useTicket";
 import {
   useDisclosure,
   Modal,
@@ -43,11 +43,17 @@ const TicketManagement = (props) => {
   const [keywords, setKeywords] = useState("");
   const [status, setStatus] = useState("");
   const [sortBy, setSortBy] = useState("");
-  const [newTicket, setNewTicket] = useState(false);
-  const { tickets, totalPages, getTickets, isError, isLoading, setIsLoading } =
-    useTickets();
+  const {
+    tickets,
+    totalPages,
+    getTickets,
+    isError,
+    isLoading,
+    setIsLoading,
+    isUpdated,
+  } = useTickets();
   const [user, setUser] = useState(null);
-
+  const [updating, setUpdating] = useState(null);
   //state for create modal
   const { isOpen, onOpen, onClose } = useDisclosure();
   const formRef = useRef(null);
@@ -62,13 +68,7 @@ const TicketManagement = (props) => {
 
   useEffect(() => {
     getTickets({ status, keywords, page, sortBy });
-  }, [status, keywords, page, sortBy, isOpen, showUpdateModal]);
-
-  // get update data when click on sidebar
-  if (props.refresh) {
-    getTickets({ status, keywords, page, sortBy });
-    props.setRefresh(false);
-  }
+  }, [status, keywords, page, sortBy, isOpen, showUpdateModal, isUpdated]);
 
   // ฟังก์ชั่นเมื่อกดปุ่มดูรายละเอียด Ticket
   const handleViewDetail = (user) => {
@@ -81,9 +81,10 @@ const TicketManagement = (props) => {
   const handleCreateClick = () => {
     if (formRef.current) {
       formRef.current.submit();
-      setIsLoading(true);
+      setUpdating(true);
       setTimeout(() => {
         onClose();
+        setUpdating(false);
       }, 1500);
     }
   };
@@ -91,9 +92,10 @@ const TicketManagement = (props) => {
   const handleUpdateClick = () => {
     if (formRef.current) {
       formRef.current.submit();
-      setIsLoading(true);
+      setUpdating(true);
       setTimeout(() => {
         setShowUpdateModal(false);
+        setUpdating(false);
       }, 1500);
     }
   };
@@ -219,7 +221,7 @@ const TicketManagement = (props) => {
                 <Button colorScheme="blue" mr={3} onClick={onClose}>
                   Close
                 </Button>
-                {isLoading ? (
+                {updating ? (
                   <Button variant="secondary" isLoading>
                     Create
                   </Button>
