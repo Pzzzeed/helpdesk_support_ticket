@@ -437,7 +437,7 @@ const TicketManagement = (props) => {
                 >
                   Cancel
                 </Button>
-                {isLoading ? (
+                {updating ? (
                   <Button variant="secondary" isLoading>
                     Update
                   </Button>
